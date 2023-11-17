@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        #mapa{
+            height:500px;
+            width: 1500px;
+            
+        }
+
+    </style>
+    <title>Leaflet JS - ISS Posição</title>
+</head>
+<body>
+        <h1>Posição Atual</h1>
+        <p>
+            Latitude: <span id="lat"></span>°
+            <br>
+            Longitude:<span id="lon"></span>°
+        </p>
+   
+        <div id="mapa">
+        <script>
+            var map = L.map('mapa').setView([51.505, -0.09], 5);
+        
+            var issIcon = L.icon({
+                iconUrl: 'imagem.png',
+                iconSize: [64, 64],
+                iconAnchor: [25, 16]
+            })
+        
+            var marker = L.marker([0, 0], { icon: issIcon }).addTo(map);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            var polygon = L.polygon([
+                [51.509, -0.08],
+                [51.503, -0.06],
+                [51.51, -0.047]
+            ]).addTo(map);
+
+            
+
+            //Cosumo api
+            const endPoint = 'https://api.wheretheiss.at/v1/satellites/25544';
+            async function getIss() {
+                const dados = await fetch(endPoint);
+                const dadosConvertidos = await dados.json();
+                const { latitude, longitude } = dadosConvertidos;
+
+                map.setView([latitude, longitude], 5); // Atualize o mapa para a posição da ISS
+                marker.setLatLng([latitude, longitude]); // Atualize a posição do marcador
+
+                document.getElementById('lat').textContent = latitude;
+                document.getElementById('lon').textContent = longitude;
+            
+            }getIss();
+
+            //setInterval(getIss, 1500);
+        </script>
+    
+     
+</body>
+</html>
